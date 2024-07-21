@@ -1,5 +1,7 @@
 using Library.DAL;
 using Library.DAL.Initializer;
+using Library.DAL.Repositories.Classes;
+using Library.DAL.Repositories.Interfaces;
 
 namespace Library
 {
@@ -16,10 +18,11 @@ namespace Library
             ApplicationConfiguration.Initialize();
 
             AppDbContext context = new AppDbContext();
+            IUserRepository userRepository = new UserRepository(context);
 
             DbSeeder.Seed(context);
 
-            Application.Run(new MainForm());
+            Application.Run(new MainForm(userRepository));
         }
     }
 }
