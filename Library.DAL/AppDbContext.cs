@@ -11,6 +11,8 @@ namespace Library.DAL
 
         public DbSet<UserEntity> Users { get; set; }
         public DbSet<RoleEntity> Roles { get; set; }
+        public DbSet<BookEntity> Books { get; set; }
+        public DbSet<AuthorEntity> Authors { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -51,6 +53,11 @@ namespace Library.DAL
                 .WithMany(r => r.Users)
                 .HasForeignKey(u => u.RoleId)
                 .IsRequired();
+
+            // many to many
+            modelBuilder.Entity<UserEntity>()
+                .HasMany(u => u.Books)
+                .WithMany(b => b.Users);
 
             base.OnModelCreating(modelBuilder);
         }

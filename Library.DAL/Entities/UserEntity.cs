@@ -15,5 +15,7 @@ namespace Library.DAL.Entities
         // Navigation properties
         public Guid RoleId { get; set; }
         public RoleEntity? Role { get; set; }
+
+        public List<BookEntity> Books { get; set; } = new();
     }
 }
