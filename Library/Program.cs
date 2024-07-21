@@ -1,3 +1,5 @@
+using Library.BLL.Services.Classes;
+using Library.BLL.Services.Interfaces;
 using Library.DAL;
 using Library.DAL.Initializer;
 using Library.DAL.Repositories.Classes;
@@ -17,12 +19,17 @@ namespace Library
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
 
-            AppDbContext context = new AppDbContext();
-            IUserRepository userRepository = new UserRepository(context);
+            using (var context = new AppDbContext())
+            {
+                IUserRepository userRepository = new UserRepository(context);
+                IUserService userService = new UserService(userRepository);
 
-            DbSeeder.Seed(context);
+                DbSeeder.Seed(context);
 
-            Application.Run(new MainForm(userRepository));
+                Application.Run(new MainForm(userService));
+
+                context.Dispose();
+            }
         }
     }
 }

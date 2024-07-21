@@ -1,29 +1,20 @@
-﻿using Library.DAL.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using Library.BLL.Services.Interfaces;
 
 namespace Library
 {
     public partial class MainForm : Form
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
 
-        public MainForm(IUserRepository userRepository)
+        public MainForm(IUserService userService)
         {
             InitializeComponent();
-            _userRepository = userRepository;
+            _userService = userService;
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private async void MainForm_Load(object sender, EventArgs e)
         {
-            var users = _userRepository.Users.ToArray();
+            var users = await _userService.GetAllUsersAsync();
 
             dataGridView1.DataSource = users;
         }
