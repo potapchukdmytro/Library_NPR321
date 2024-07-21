@@ -1,4 +1,6 @@
-﻿namespace Library.DAL.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Library.DAL.Entities
 {
     public class RoleEntity : BaseEntity<Guid>
     {
