@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Library.BLL.Services.Interfaces;
 using Library.BLL.ViewModels;
+using Library.DAL;
 using Library.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,23 +11,46 @@ namespace Library.BLL.Services.Classes
     {
         private IUserRepository _userRepository;
         private IBookRepository _bookRepository;
+        private AppDbContext _context;
         private IMapper _mapper;
 
-        public UserService(IUserRepository userRepository, IMapper mapper, IBookRepository bookRepository)
+        public UserService(IUserRepository userRepository, IMapper mapper, IBookRepository bookRepository, AppDbContext context)
         {
             _userRepository = userRepository;
             _mapper = mapper;
             _bookRepository = bookRepository;
+            _context = context;
         }
 
         public async Task AddBooksForUserAsync(Guid userId, List<Guid> booksId)
         {
-            var user = await _userRepository.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await _userRepository.GetByIdIncludesAsync(userId);
 
             if (user != null)
             {
-                var books = _bookRepository.Books.Where(b => booksId.Contains(b.Id));
-                user.Books.AddRange(books);
+                foreach (var bookId in booksId)
+                {
+                    var existingBook = _context.Books.Local.FirstOrDefault(b => b.Id == bookId);
+
+                    if (existingBook == null)
+                    {
+                        var book = await _bookRepository.Books.FirstOrDefaultAsync(b => b.Id == bookId);
+
+                        if (book != null)
+                        {
+                            user.Books.Add(book);
+                        }
+                    }
+                    else
+                    {
+                        if (!user.Books.Contains(existingBook))
+                        {
+                            user.Books.Add(existingBook);
+                        }
+                    }
+                }
+
+                _context.Attach(user);
                 await _userRepository.UpdateAsync(user);
             }
         }

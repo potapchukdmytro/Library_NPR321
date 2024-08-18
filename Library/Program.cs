@@ -37,7 +37,7 @@ namespace Library
                 IUserRepository userRepository = new UserRepository(context);
                 IBookRepository bookRepository = new BookRepository(context);
 
-                IUserService userService = new UserService(userRepository, mapper, bookRepository);
+                IUserService userService = new UserService(userRepository, mapper, bookRepository, context);
                 IAuthService authService = new AuthService(userRepository, mapper);
                 IBookService bookService = new BookService(bookRepository, mapper);
 
