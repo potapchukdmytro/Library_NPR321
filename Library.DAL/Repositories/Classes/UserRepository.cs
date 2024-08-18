@@ -13,14 +13,31 @@ namespace Library.DAL.Repositories.Classes
             _context = context;
         }
 
-        public IQueryable<UserEntity> Users => GetAll()
-            .Include(u => u.Role)
-            .Include(u => u.Books)
-            .AsNoTracking();
-
-        public Task<UserEntity> GetByEmailAsync(string email)
+        private IQueryable<UserEntity> GetUsersWithIncludes()
         {
-            throw new NotImplementedException();
+            return GetAll()
+                .Include(u => u.Role)
+                .Include(u => u.Books)
+                .ThenInclude(b => b.Author);
+        }
+
+        public IQueryable<UserEntity> Users => GetUsersWithIncludes().AsNoTracking();
+
+        public async Task<UserEntity?> GetByEmailAsync(string email)
+        {
+            return await Users
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<UserEntity?> GetByIdIncludesAsync(Guid id)
+        {
+            return await GetUsersWithIncludes()
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+
+        public async Task<UserEntity?> GetByUsername(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.UserName == username);
         }
     }
 }
